@@ -4,6 +4,11 @@ SECTIONS
 {
     . = 1M;
 
+    .requests : ALIGN(4K)
+    {
+        KEEP(*(.requests))
+    }
+
     .text : ALIGN(4K)
     {
         *(.text*)
