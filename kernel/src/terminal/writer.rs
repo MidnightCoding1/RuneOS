@@ -1,8 +1,10 @@
 use limine::framebuffer::Framebuffer;
 
 pub struct TerminalWriter {
-    pub framebuffer: &'static Framebuffer,
-    pub color: u32,
+    framebuffer: &'static Framebuffer,
+    color: u32,
+    x: usize,
+    y: usize,
 }
 
 impl TerminalWriter {
@@ -10,28 +12,43 @@ impl TerminalWriter {
         Self {
             framebuffer,
             color,
+            x: 0,
+            y: 0,
         }
     }
 
-    pub fn write_char(&self, x: usize, y: usize, ch: u8) {
+    pub fn write_char(&mut self, ch: u8) {
+        if ch == b'\n' {
+            self.x = 0;
+            self.y += 1;
+            return;
+        }
+
+        self.draw_char(self.x, self.y, ch);
+
+        self.x += 1;
+
+        if self.x > 80 {
+            self.x = 0;
+            self.y += 1;
+        }
+    }
+
+    pub fn write_str(&mut self, s: &str) {
+        for b in s.bytes() {
+            self.write_char(b);
+        }
+    }
+
+    fn draw_char(&self, x: usize, y: usize, _ch: u8) {
         let scale = 2;
+
         let base_x = x * 8 * scale;
         let base_y = y * 8 * scale;
 
-        for row in 0..8 {
-            for col in 0..8 {
-                let pixel_on = (ch + row as u8 + col as u8) % 2 == 0;
-
-                if pixel_on {
-                    for dy in 0..scale {
-                        for dx in 0..scale {
-                            let px = base_x + col * scale + dx;
-                            let py = base_y + row * scale + dy;
-
-                            self.draw_pixel(px, py);
-                        }
-                    }
-                }
+        for dy in 0..8 * scale {
+            for dx in 0..8 * scale {
+                self.draw_pixel(base_x + dx, base_y + dy);
             }
         }
     }
@@ -52,7 +69,6 @@ impl TerminalWriter {
         let width = self.framebuffer.width() as usize;
         let height = self.framebuffer.height() as usize;
         let pitch = self.framebuffer.pitch() as usize;
-
         let addr = self.framebuffer.addr();
 
         for y in 0..height {
