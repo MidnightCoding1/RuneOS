@@ -4,6 +4,7 @@
 mod panic;
 mod terminal;
 mod input;
+mod interrupts;
 
 use limine::request::FramebufferRequest;
 use terminal::writer::TerminalWriter;
@@ -19,12 +20,9 @@ static END_MARKER: [u64; 2] = [0, 0];
 
 fn handle_command(cmd: &str, term: &mut TerminalWriter) {
     match cmd {
-        "help" => term.write_str("help exit clear\n"),
+        "help" => term.write_str("help clear\n"),
         "clear" => term.clear(0x202020),
-        "exit" => term.write_str("no exit in kernel\n"),
-        _ => {
-            term.write_str("unknown command\n");
-        }
+        _ => term.write_str("unknown\n"),
     }
 }
 
@@ -36,6 +34,7 @@ pub extern "C" fn _start() -> ! {
     let mut term = TerminalWriter::new(fb, 0xFFFFFF);
 
     term.clear(0x202020);
+    term.write_str("RuneOS\n");
 
     let mut buffer = [0u8; 128];
     let mut idx = 0;
