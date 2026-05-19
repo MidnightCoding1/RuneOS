@@ -8,6 +8,7 @@ pub fn push_key(key: u8) {
 
 pub fn pop_key() -> Option<u8> {
     let key = LAST_KEY.swap(0, Ordering::SeqCst);
+
     if key == 0 {
         None
     } else {
