@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-limine = "0.2.0"
-x86_64 = "0.15.1"
+limine = "0.6.3"
 
 [profile.dev]
 panic = "abort"
