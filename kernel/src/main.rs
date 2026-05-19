@@ -9,6 +9,7 @@ mod interrupts;
 use limine::request::FramebufferRequest;
 use terminal::writer::TerminalWriter;
 use input::keyboard;
+use interrupts::idt;
 
 #[used]
 #[link_section = ".requests"]
@@ -28,6 +29,8 @@ fn handle_command(cmd: &str, term: &mut TerminalWriter) {
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    idt::init_idt();
+
     let fb = FRAMEBUFFER_REQUEST.get_response().unwrap()
         .framebuffers().next().unwrap();
 
