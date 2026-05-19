@@ -7,6 +7,7 @@ pub extern "x86-interrupt" fn keyboard_interrupt_handler(
 ) {
     unsafe {
         let mut port = Port::new(0x60);
+
         let scancode: u8 = port.read();
 
         if let Some(key) = translate_scancode(scancode) {
@@ -14,6 +15,7 @@ pub extern "x86-interrupt" fn keyboard_interrupt_handler(
         }
 
         let mut pic = Port::new(0x20);
+
         pic.write(0x20);
     }
 }
@@ -46,8 +48,8 @@ fn translate_scancode(scancode: u8) -> Option<u8> {
         0x2D => Some(b'x'),
         0x15 => Some(b'y'),
         0x2C => Some(b'z'),
-        0x1C => Some(b'\n'),
         0x39 => Some(b' '),
+        0x1C => Some(b'\n'),
         _ => None,
     }
 }
