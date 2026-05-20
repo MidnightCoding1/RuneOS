@@ -19,11 +19,11 @@ use interrupts::pic;
 use x86_64::instructions::interrupts as cpu_interrupts;
 
 #[used]
-#[link_section = ".requests"]
+#[unsafe(link_section = ".requests")]
 static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
 #[used]
-#[link_section = ".requests"]
+#[unsafe(link_section = ".requests")]
 static END_MARKER: [u64; 2] = [0, 0];
 
 fn handle_command(cmd: &str, term: &mut TerminalWriter) {
@@ -42,19 +42,16 @@ fn handle_command(cmd: &str, term: &mut TerminalWriter) {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     idt::init_idt();
 
     pic::init();
 
-    unsafe {
-        cpu_interrupts::enable();
-    }
+    cpu_interrupts::enable();
 
     let fb = FRAMEBUFFER_REQUEST
         .response()
-        .get()
         .unwrap()
         .framebuffers()
         .next()
