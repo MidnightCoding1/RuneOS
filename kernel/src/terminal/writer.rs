@@ -24,7 +24,7 @@ impl TerminalWriter {
             return;
         }
 
-        self.draw_char(self.x, self.y, ch);
+        self.draw_char(self.x, self.y);
 
         self.x += 1;
 
@@ -40,7 +40,7 @@ impl TerminalWriter {
         }
     }
 
-    fn draw_char(&self, x: usize, y: usize, _ch: u8) {
+    fn draw_char(&self, x: usize, y: usize) {
         let scale = 2;
 
         let base_x = x * 8 * scale;
@@ -54,22 +54,27 @@ impl TerminalWriter {
     }
 
     fn draw_pixel(&self, x: usize, y: usize) {
-        let pitch = self.framebuffer.pitch() as usize;
-        let addr = self.framebuffer.addr();
+        let pitch = self.framebuffer.pitch as usize;
+
+        let addr = self.framebuffer.address.as_ptr();
 
         let offset = y * pitch + x * 4;
 
         unsafe {
             let pixel = addr.add(offset).cast::<u32>();
+
             pixel.write_volatile(self.color);
         }
     }
 
     pub fn clear(&self, color: u32) {
-        let width = self.framebuffer.width() as usize;
-        let height = self.framebuffer.height() as usize;
-        let pitch = self.framebuffer.pitch() as usize;
-        let addr = self.framebuffer.addr();
+        let width = self.framebuffer.width as usize;
+
+        let height = self.framebuffer.height as usize;
+
+        let pitch = self.framebuffer.pitch as usize;
+
+        let addr = self.framebuffer.address.as_ptr();
 
         for y in 0..height {
             for x in 0..width {
@@ -77,6 +82,7 @@ impl TerminalWriter {
 
                 unsafe {
                     let pixel = addr.add(offset).cast::<u32>();
+
                     pixel.write_volatile(color);
                 }
             }
