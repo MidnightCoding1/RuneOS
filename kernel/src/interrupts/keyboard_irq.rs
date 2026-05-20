@@ -3,24 +3,23 @@ use x86_64::instructions::port::Port;
 use crate::input::keyboard;
 
 pub extern "x86-interrupt" fn keyboard_interrupt_handler(
-    _stack_frame: x86_64::structures::idt::InterruptStackFrame
+    _stack_frame: x86_64::structures::idt::InterruptStackFrame,
 ) {
     unsafe {
-        let mut port = Port::new(0x60);
+        let mut data_port = Port::<u8>::new(0x60);
 
-        let scancode: u8 = port.read();
+        let scancode = data_port.read();
 
-        if let Some(key) = translate_scancode(scancode) {
+        if let Some(key) = translate(scancode) {
             keyboard::push_key(key);
         }
 
-        let mut pic = Port::new(0x20);
-
-        pic.write(0x20);
+        let mut command = Port::<u8>::new(0x20);
+        command.write(0x20);
     }
 }
 
-fn translate_scancode(scancode: u8) -> Option<u8> {
+fn translate(scancode: u8) -> Option<u8> {
     match scancode {
         0x1E => Some(b'a'),
         0x30 => Some(b'b'),
