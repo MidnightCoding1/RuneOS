@@ -21,6 +21,7 @@ impl TerminalWriter {
         if ch == b'\n' {
             self.x = 0;
             self.y += 1;
+
             return;
         }
 
@@ -30,6 +31,7 @@ impl TerminalWriter {
 
         if self.x > 80 {
             self.x = 0;
+
             self.y += 1;
         }
     }
@@ -44,6 +46,7 @@ impl TerminalWriter {
         let scale = 2;
 
         let base_x = x * 8 * scale;
+
         let base_y = y * 8 * scale;
 
         for dy in 0..8 * scale {
@@ -56,7 +59,7 @@ impl TerminalWriter {
     fn draw_pixel(&self, x: usize, y: usize) {
         let pitch = self.framebuffer.pitch as usize;
 
-        let addr = self.framebuffer.address.as_ptr();
+        let addr = self.framebuffer.address().as_ptr();
 
         let offset = y * pitch + x * 4;
 
@@ -74,7 +77,7 @@ impl TerminalWriter {
 
         let pitch = self.framebuffer.pitch as usize;
 
-        let addr = self.framebuffer.address.as_ptr();
+        let addr = self.framebuffer.address().as_ptr();
 
         for y in 0..height {
             for x in 0..width {
