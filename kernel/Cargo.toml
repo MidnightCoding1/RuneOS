@@ -9,7 +9,10 @@ limine = "0.6.3"
 [dependencies.x86_64]
 version = "0.15.4"
 default-features = false
-features = ["instructions"]
+features = [
+    "instructions",
+    "abi_x86_interrupt",
+]
 
 [profile.dev]
 panic = "abort"
