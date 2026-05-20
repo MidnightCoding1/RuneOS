@@ -59,12 +59,14 @@ impl TerminalWriter {
     fn draw_pixel(&self, x: usize, y: usize) {
         let pitch = self.framebuffer.pitch as usize;
 
-        let addr = self.framebuffer.address().as_ptr();
+        let addr = self.framebuffer.address();
 
         let offset = y * pitch + x * 4;
 
         unsafe {
-            let pixel = addr.add(offset).cast::<u32>();
+            let pixel = (addr as *mut u8)
+                .add(offset)
+                .cast::<u32>();
 
             pixel.write_volatile(self.color);
         }
@@ -77,14 +79,16 @@ impl TerminalWriter {
 
         let pitch = self.framebuffer.pitch as usize;
 
-        let addr = self.framebuffer.address().as_ptr();
+        let addr = self.framebuffer.address();
 
         for y in 0..height {
             for x in 0..width {
                 let offset = y * pitch + x * 4;
 
                 unsafe {
-                    let pixel = addr.add(offset).cast::<u32>();
+                    let pixel = (addr as *mut u8)
+                        .add(offset)
+                        .cast::<u32>();
 
                     pixel.write_volatile(color);
                 }
