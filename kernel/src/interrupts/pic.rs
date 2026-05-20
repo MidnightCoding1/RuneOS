@@ -8,16 +8,15 @@ const PIC2_DATA: u16 = 0xA1;
 
 const ICW1_INIT: u8 = 0x10;
 const ICW1_ICW4: u8 = 0x01;
-
 const ICW4_8086: u8 = 0x01;
 
-pub fn init_pic() {
+pub fn init() {
     unsafe {
-        let mut pic1_command = Port::new(PIC1_COMMAND);
-        let mut pic1_data = Port::new(PIC1_DATA);
+        let mut pic1_command = Port::<u8>::new(PIC1_COMMAND);
+        let mut pic1_data = Port::<u8>::new(PIC1_DATA);
 
-        let mut pic2_command = Port::new(PIC2_COMMAND);
-        let mut pic2_data = Port::new(PIC2_DATA);
+        let mut pic2_command = Port::<u8>::new(PIC2_COMMAND);
+        let mut pic2_data = Port::<u8>::new(PIC2_DATA);
 
         pic1_command.write(ICW1_INIT | ICW1_ICW4);
         pic2_command.write(ICW1_INIT | ICW1_ICW4);
