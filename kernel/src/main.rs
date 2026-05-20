@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(abi_x86_interrupt)]
 
 mod panic;
 mod terminal;
@@ -15,7 +16,7 @@ use input::keyboard;
 use interrupts::idt;
 use interrupts::pic;
 
-use x86_64::instructions::interrupts;
+use x86_64::instructions::interrupts as cpu_interrupts;
 
 #[used]
 #[link_section = ".requests"]
@@ -45,14 +46,15 @@ fn handle_command(cmd: &str, term: &mut TerminalWriter) {
 pub extern "C" fn _start() -> ! {
     idt::init_idt();
 
-    pic::init_pic();
+    pic::init();
 
     unsafe {
-        interrupts::enable();
+        cpu_interrupts::enable();
     }
 
     let fb = FRAMEBUFFER_REQUEST
-        .get_response()
+        .response()
+        .get()
         .unwrap()
         .framebuffers()
         .next()
