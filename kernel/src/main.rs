@@ -50,12 +50,12 @@ pub extern "C" fn _start() -> ! {
 
     cpu_interrupts::enable();
 
-    let fb = FRAMEBUFFER_REQUEST
+    let response = FRAMEBUFFER_REQUEST
         .response()
-        .unwrap()
-        .framebuffers()
-        .next()
         .unwrap();
+
+    let fb = response
+        .framebuffers()[0];
 
     let mut term = TerminalWriter::new(fb, 0xFFFFFF);
 
